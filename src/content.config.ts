@@ -5,16 +5,37 @@ const blog = defineCollection({
   loader: async () => {
     const postsResponse = await client.queries.blogConnection();
 
+    // Ensure we return an array, even if edges is undefined
+    const edges = postsResponse.data.blogConnection.edges || [];
+
     // Map Tina posts to the correct format for Astro
-    return postsResponse.data.blogConnection.edges
-      ?.filter((post) => !!post)
+    return edges
+      .filter((post): post is NonNullable<typeof post> => !!post?.node)
       .map((post) => {
-        const node = post?.node;
+        const node = post.node;
+        if (!node?._sys) {
+          throw new Error(
+            `Missing _sys data for post: ${JSON.stringify(node)}`,
+          );
+        }
 
         return {
-          ...node,
-          id: node?._sys.relativePath.replace(/\.mdx?$/, ""), // Generate clean URLs
-          tinaInfo: node?._sys, // Include Tina system info if needed
+          id: node._sys.relativePath.replace(/\.mdx?$/, ""), // Generate clean URLs
+          // Spread the node data (title, description, etc.)
+          title: node.title || "",
+          description: node.description || "",
+          pubDate: new Date(node.pubDate || Date.now()),
+          updatedDate: node.updatedDate
+            ? new Date(node.updatedDate)
+            : undefined,
+          heroImage: node.heroImage || null,
+          // Include Tina system info
+          tinaInfo: {
+            filename: node._sys.filename,
+            basename: node._sys.basename,
+            path: node._sys.path,
+            relativePath: node._sys.relativePath,
+          },
         };
       });
   },
@@ -37,16 +58,31 @@ const page = defineCollection({
   loader: async () => {
     const postsResponse = await client.queries.pageConnection();
 
-    // Map Tina posts to the correct format for Astro
-    return postsResponse.data.pageConnection.edges
-      ?.filter((p) => !!p)
+    // Ensure we return an array, even if edges is undefined
+    const edges = postsResponse.data.pageConnection.edges || [];
+
+    return edges
+      .filter((p): p is NonNullable<typeof p> => !!p?.node)
       .map((p) => {
-        const node = p?.node;
+        const node = p.node;
+        if (!node?._sys) {
+          throw new Error(
+            `Missing _sys data for page: ${JSON.stringify(node)}`,
+          );
+        }
 
         return {
-          ...node,
-          id: node?._sys.relativePath.replace(/\.mdx?$/, ""), // Generate clean URLs
-          tinaInfo: node?._sys, // Include Tina system info if needed
+          id: node._sys.relativePath.replace(/\.mdx?$/, ""), // Generate clean URLs
+          // Spread the node data
+          seoTitle: node.seoTitle || "",
+          body: node.body,
+          // Include Tina system info
+          tinaInfo: {
+            filename: node._sys.filename,
+            basename: node._sys.basename,
+            path: node._sys.path,
+            relativePath: node._sys.relativePath,
+          },
         };
       });
   },
@@ -60,5 +96,5 @@ const page = defineCollection({
     seoTitle: z.string(),
     body: z.any(),
   }),
-})
+});
 export const collections = { blog, page };
