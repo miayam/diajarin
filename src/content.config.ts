@@ -97,4 +97,58 @@ const page = defineCollection({
     body: z.any(),
   }),
 });
-export const collections = { blog, page };
+
+const post = defineCollection({
+  loader: async () => {
+    const postsResponse = await client.queries.postConnection();
+
+    // Ensure we return an array, even if edges is undefined
+    const edges = postsResponse.data.postConnection.edges || [];
+
+    // Map Tina posts to the correct format for Astro
+    return edges
+      .filter((post): post is NonNullable<typeof post> => !!post?.node)
+      .map((post) => {
+        const node = post.node;
+        if (!node?._sys) {
+          throw new Error(
+            `Missing _sys data for post: ${JSON.stringify(node)}`,
+          );
+        }
+
+        return {
+          id: node._sys.relativePath.replace(/\.mdx?$/, ""), // Generate clean URLs
+          // Spread the node data (title, description, etc.)
+          title: node.title || "",
+          description: node.description || "",
+          pubDate: new Date(node.pubDate || Date.now()),
+          updatedDate: node.updatedDate
+            ? new Date(node.updatedDate)
+            : undefined,
+          heroImage: node.heroImage || null,
+          // Include Tina system info
+          tinaInfo: {
+            filename: node._sys.filename,
+            basename: node._sys.basename,
+            path: node._sys.path,
+            relativePath: node._sys.relativePath,
+          },
+        };
+      });
+  },
+  schema: z.object({
+    tinaInfo: z.object({
+      filename: z.string(),
+      basename: z.string(),
+      path: z.string(),
+      relativePath: z.string(),
+    }),
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    heroImage: z.string().nullish(),
+  }),
+});
+
+export const collections = { blog, page, post };
