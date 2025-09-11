@@ -44,5 +44,11 @@ export const PostCollection: Collection = {
       label: "Body",
       isBody: true,
     },
+    {
+      label: "Author",
+      name: "author",
+      type: "reference",
+      collections: ["author"],
+    },
   ],
 };

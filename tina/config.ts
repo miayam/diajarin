@@ -3,6 +3,7 @@ import { BlogCollection } from "./collections/blog";
 import { GlobalConfigCollection } from "./collections/global-config";
 import { PageCollection } from "./collections/page";
 import { PostCollection } from "./collections/posts";
+import { AuthorCollection } from "./collections/author";
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
@@ -32,6 +33,7 @@ export default defineConfig({
   // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/schema/
   schema: {
     collections: [
+      AuthorCollection,
       BlogCollection,
       PageCollection,
       GlobalConfigCollection,
