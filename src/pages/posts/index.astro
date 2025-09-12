@@ -6,7 +6,7 @@ import config from "@/content/config/config.json";
 import { getCollection } from "astro:content";
 import FormattedDate from "@/components/display/FormattedDate.astro";
 
-const posts = (await getCollection("blog")).sort(
+const posts = (await getCollection("post")).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---
