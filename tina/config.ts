@@ -4,6 +4,8 @@ import { GlobalConfigCollection } from "./collections/global-config";
 import { PageCollection } from "./collections/page";
 import { PostCollection } from "./collections/posts";
 import { AuthorCollection } from "./collections/author";
+import { TagCollection } from "./collections/tags";
+import { ThreadCollection } from "./collections/threads";
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
@@ -38,6 +40,8 @@ export default defineConfig({
       PageCollection,
       GlobalConfigCollection,
       PostCollection,
+      TagCollection,
+      ThreadCollection,
     ],
   },
   search: {

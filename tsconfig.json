@@ -5,8 +5,8 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@tina/*": ["tina/*"]
+      "@/*": ["./src/*"],
+      "@tina/*": ["./tina/*"]
     }
   }
 }

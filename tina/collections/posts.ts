@@ -50,5 +50,44 @@ export const PostCollection: Collection = {
       type: "reference",
       collections: ["author"],
     },
+    {
+      label: "Tags",
+      name: "tags",
+      type: "object",
+      list: true,
+      ui: {
+        itemProps: (item) => {
+          return { label: item?.tag || "Tag" };
+        },
+      },
+      fields: [
+        {
+          label: "Tag",
+          name: "tag",
+          type: "reference",
+          collections: ["tag"],
+        },
+      ],
+    },
+
+    {
+      label: "Threads",
+      name: "threads",
+      type: "object",
+      list: true,
+      ui: {
+        itemProps: (item) => {
+          return { label: item?.thread || "Thread" };
+        },
+      },
+      fields: [
+        {
+          label: "Thread",
+          name: "thread",
+          type: "reference",
+          collections: ["thread"],
+        },
+      ],
+    },
   ],
 };
