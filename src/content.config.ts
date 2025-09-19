@@ -1,5 +1,7 @@
 import { defineCollection, z } from "astro:content";
 import client from "../tina/__generated__/client";
+import { glob } from "astro/loaders";
+import { reference } from "astro:content";
 
 const blog = defineCollection({
   loader: async () => {
@@ -160,7 +162,7 @@ const post = defineCollection({
         z.object({
           name: z.string(),
           slug: z.string().url(),
-          descriptoin: z.string().optional(),
+          description: z.string().optional(),
         }),
       )
       .optional(),
@@ -169,11 +171,50 @@ const post = defineCollection({
         z.object({
           name: z.string(),
           slug: z.string().url(),
-          descriptoin: z.string().optional(),
+          description: z.string().optional(),
         }),
       )
       .optional(),
   }),
 });
 
-export const collections = { blog, page, post };
+const authors = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/data/authors" }),
+  schema: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    bio: z.string().optional(),
+  }),
+});
+
+const posts = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/data/posts" }),
+  schema: z.object({
+    title: z.string(),
+    publisDate: z.coerce.date(),
+    updateDate: z.coerce.date().optional(),
+    author: reference("authors"),
+    tags: z.array(reference("tags")),
+    threads: z.array(reference("threads")),
+    featuredImage: z.string().optional(),
+    published: z.boolean(),
+  }),
+});
+
+const threads = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/data/threads" }),
+  schema: z.object({
+    name: z.string(),
+    label: z.string(),
+  }),
+});
+
+const tags = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/data/tags" }),
+  schema: z.object({
+    name: z.string(),
+    label: z.string(),
+  }),
+});
+
+export const collections = { blog, page, post, authors, posts, tags, threads };
