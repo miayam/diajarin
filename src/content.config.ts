@@ -187,8 +187,8 @@ const authors = defineCollection({
   }),
 });
 
-const posts = defineCollection({
-  loader: glob({ pattern: "**/*.mdx", base: "./src/data/posts" }),
+const articles = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/data/articles" }),
   schema: z.object({
     title: z.string(),
     publisDate: z.coerce.date(),
@@ -197,7 +197,9 @@ const posts = defineCollection({
     tags: z.array(reference("tags")),
     threads: z.array(reference("threads")),
     featuredImage: z.string().optional(),
-    published: z.boolean(),
+    draft: z.boolean(),
+    readingTime: z.string().optional(),
+    excerpt: z.string().optional(),
   }),
 });
 
@@ -217,4 +219,12 @@ const tags = defineCollection({
   }),
 });
 
-export const collections = { blog, page, post, authors, posts, tags, threads };
+export const collections = {
+  blog,
+  page,
+  post,
+  authors,
+  articles,
+  tags,
+  threads,
+};
